@@ -1,0 +1,120 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <limits>
+#include <string>
+#include <sstream>
+#include <vector>
+
+// Function to clear the input buffer
+void clearInputBuffer() {
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+// Function to generate a random number between 1 and the given max value
+int generateRandomNumber(int max) {
+    return rand() % max + 1;
+}
+
+// Function to print a greeting message
+void printGreeting() {
+    std::cout << "******************************************" << std::endl;
+    std::cout << "*        Welcome to the Guessing Game!  *" << std::endl;
+    std::cout << "* Try to guess the random number I pick. *" << std::endl;
+    std::cout << "* I will give feedback on whether your   *" << std::endl;
+    std::cout << "* guess is too high or too low.         *" << std::endl;
+    std::cout << "* Let's see how many attempts it takes   *" << std::endl;
+    std::cout << "* you to guess the correct number!       *" << std::endl;
+    std::cout << "******************************************" << std::endl;
+}
+
+// Function to display feedback based on the user's guess
+void giveFeedback(int guess, int number) {
+    if (guess < number) {
+        std::cout << "Your guess is too low. Try again!" << std::endl;
+    } else if (guess > number) {
+        std::cout << "Your guess is too high. Try again!" << std::endl;
+    } else {
+        std::cout << "Congratulations! You guessed the correct number!" << std::endl;
+    }
+}
+
+// Function to ask the user to input an integer within a given range
+int getValidInput(int min, int max) {
+    int input;
+    while (true) {
+        std::cout << "Please enter a number between " << min << " and " << max << ": ";
+        std::cin >> input;
+        if (std::cin.fail() || input < min || input > max) {
+            std::cin.clear();
+            clearInputBuffer();
+            std::cout << "Invalid input. Try again!" << std::endl;
+        } else {
+            break;
+        }
+    }
+    return input;
+}
+
+// Function to track the number of attempts and guesses
+void trackAttempts(int attempts, const std::vector<int>& guesses) {
+    std::cout << "You have made " << attempts << " attempts." << std::endl;
+    std::cout << "Your previous guesses were: ";
+    for (int i = 0; i < guesses.size(); ++i) {
+        std::cout << guesses[i] << (i == guesses.size() - 1 ? "" : ", ");
+    }
+    std::cout << std::endl;
+}
+
+// Function to play the game
+void playGame() {
+    int maxRange = 100;
+    bool playAgain = true;
+
+    // Seed the random number generator
+    srand(time(0));
+
+    // Loop to keep the game running as long as the user wants to play again
+    while (playAgain) {
+        int number = generateRandomNumber(maxRange);
+        int guess;
+        int attempts = 0;
+        std::vector<int> guesses;  // To store previous guesses
+
+        std::cout << "\nI have picked a random number between 1 and " << maxRange << ". Try to guess it!" << std::endl;
+
+        // Start the guessing loop
+        do {
+            guess = getValidInput(1, maxRange);  // Get a valid input from the user
+            attempts++;
+            guesses.push_back(guess);  // Store the guess
+
+            giveFeedback(guess, number);
+            trackAttempts(attempts, guesses);  // Track and display attempts
+        } while (guess != number);
+
+        std::cout << "You guessed the number in " << attempts << " attempts." << std::endl;
+
+        // Ask if the user wants to play again
+        std::string response;
+        std::cout << "\nDo you want to play again? (yes/no): ";
+        std::cin >> response;
+        clearInputBuffer();  // Clear the buffer to avoid issues with the next input
+
+        // If user chooses "yes", play again; otherwise, end the game.
+        if (response != "yes" && response != "y") {
+            playAgain = false;
+            std::cout << "Thanks for playing! Goodbye!" << std::endl;
+        }
+    }
+}
+
+int main() {
+    // Display the greeting message
+    printGreeting();
+
+    // Call the playGame function to start the game
+    playGame();
+
+    return 0;
+}
